@@ -1,5 +1,7 @@
 import pytest
 
+from app.controllers.beverage import BeverageController
+
 
 def test_create(app, beverage: dict):
     created_beverage, error = BeverageController.create(beverage)
