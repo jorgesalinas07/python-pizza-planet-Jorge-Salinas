@@ -50,10 +50,12 @@ def test_create(app, ingredients, size, client_data, beverages):
         pytest.assume(size_id == created_order['size']['_id'])
 
         ingredients_in_detail = set(
-            item['ingredient']['_id'] for item in created_order['detail'])
-        pytest.assume(not ingredients_in_detail.difference(ingredient_ids))
+            item['ingredient']['_id'] for item in created_order['detail'] if item['ingredient'] != None)
+
         beverages_in_detail = set(item['beverage']['_id']
-                                  for item in created_order['detail'])
+                                  for item in created_order['detail'] if item['beverage'] != None)
+        pytest.assume(not ingredients_in_detail.difference(ingredient_ids))
+
         pytest.assume(not beverages_in_detail.difference(beverage_ids))
 
 
@@ -84,16 +86,16 @@ def test_get_by_id(app, ingredients, size, client_data, beverages):
         pytest.assume(size_id == created_order['size']['_id'])
 
         ingredients_in_detail = set(
-            item['ingredient']['_id'] for item in created_order['detail'])
+            item['ingredient']['_id'] for item in created_order['detail'] if item['ingredient'] != None)
         pytest.assume(not ingredients_in_detail.difference(ingredient_ids))
         beverages_in_detail = set(item['beverage']['_id']
-                                  for item in created_order['detail'])
+                                  for item in created_order['detail'] if item['beverage'] != None)
         pytest.assume(not beverages_in_detail.difference(beverage_ids))
 
 
-def test_get_all(app, ingredients, sizes, client_data, beverage):
+def test_get_all(app, ingredients, sizes, client_data, beverages):
     created_sizes, created_ingredients, created_beverages = __create_sizes_ingredients_and_beverages(
-        ingredients, sizes, beverage)
+        ingredients, sizes, beverages)
     created_orders = []
     for _ in range(5):
         order = __order(shuffle_list(created_ingredients)[
@@ -110,4 +112,3 @@ def test_get_all(app, ingredients, sizes, client_data, beverage):
         assert current_id in searchable_orders
         for param, value in created_order.items():
             pytest.assume(searchable_orders[current_id][param] == value)
-            
