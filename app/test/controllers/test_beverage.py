@@ -1,5 +1,6 @@
 import pytest
 
+from app.controllers.beverage import BeverageController
 
 def test_create(app, beverage: dict):
     created_beverage, error = BeverageController.create(beverage)
@@ -50,3 +51,4 @@ def test_get_all(app, beverages: list):
         assert current_id in searchable_beverages
         for param, value in created_beverage.items():
             pytest.assume(searchable_beverages[current_id][param] == value)
+            
