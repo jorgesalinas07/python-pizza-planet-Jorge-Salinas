@@ -63,13 +63,27 @@ class OrderManager(BaseManager):
         cls.session.add(new_order)
         cls.session.flush()
         cls.session.refresh(new_order)
-        cls.session.add_all([
-            *[OrderDetail(order_id=new_order._id, beverage_id=beverage._id, beverage_price=beverage.price)
-                             for beverage in beverages],
-            *[OrderDetail(order_id=new_order._id, ingredient_id=ingredient._id, ingredient_price=ingredient.price)
-                             for ingredient in ingredients]
-        ])
-
+        while len(ingredients) != len(beverages):
+            if len(ingredients) > len(beverages):
+                beverages.append(None)
+            if len(ingredients) < len(beverages):
+                ingredients.append(None)
+        for index, (beverage, ingredient) in enumerate(zip(beverages, ingredients)):
+            actual_index = index
+            if beverages[actual_index] is not None and ingredients[actual_index] is not None:
+                cls.session.add_all(
+                    [OrderDetail(order_id=new_order._id, ingredient_id=ingredient._id, ingredient_price=ingredient.price,
+                                beverage_id=beverage._id, beverage_price=beverage.price)])
+            elif beverages[actual_index] is not None:
+                if ingredients[actual_index] is None:
+                    cls.session.add_all(
+                    [OrderDetail(order_id=new_order._id, beverage_id=beverage._id, beverage_price=beverage.price)])
+            elif ingredients[actual_index] is not None:
+                if beverages[actual_index] is None:
+                    cls.session.add_all(
+                    [OrderDetail(order_id=new_order._id, ingredient_id=ingredient._id, ingredient_price=ingredient.price)])
+            else:
+                break
         cls.session.commit()
         return cls.serializer().dump(new_order)
 
