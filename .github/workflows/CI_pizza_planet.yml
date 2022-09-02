@@ -29,4 +29,5 @@ jobs:
       if: steps.cache-virtualenv.outputs.cache-hit != 'true'
 
     - name: Test
-      run: python manage.py test
+      run: |
+      python3 -m pytest -v app/test
