@@ -1,5 +1,5 @@
-from app.common.http_methods import POST, PUT, GET
-from flask import Blueprint, request
+from app.common.http_methods import GET
+from flask import Blueprint
 from app.controllers.report import ReportController
 from app.services.base import BaseService
 
