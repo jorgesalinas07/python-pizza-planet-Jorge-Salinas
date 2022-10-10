@@ -1,7 +1,11 @@
+import random
 import pytest
-
+from datetime import datetime
 from ..utils.functions import (shuffle_list, get_random_sequence,
                                get_random_string)
+
+def date_mock() -> str:
+    return f'{random.randrange(1,12)}/{random.randrange(1,28)}/2022'
 
 
 def client_data_mock() -> dict:
@@ -57,6 +61,7 @@ def create_repeted_clients_and_ingredients_order(create_ingredients, create_size
     most_repeated_client = client_data
     second_most_repeated_client = client_data_mock()
     third_most_repeated_client = client_data_mock()
+    month_with_more_revenue = date_mock()
     orders = []
     ingredients = [ingredient.get('_id') for ingredient in create_ingredients]
     beverage = [beverage.get('_id') for beverage in create_beverages]
@@ -67,7 +72,8 @@ def create_repeted_clients_and_ingredients_order(create_ingredients, create_size
             **most_repeated_client,
             'ingredients': [ingredients[0]],
             'size_id': size_id,
-            'beverages': beverage
+            'beverages': beverage,
+            'date': month_with_more_revenue
         }
         orders.append(new_order)
         if i % 2 == 0:
@@ -75,7 +81,8 @@ def create_repeted_clients_and_ingredients_order(create_ingredients, create_size
                 **second_most_repeated_client,
                 'ingredients': [ingredients[0]],
                 'size_id': size_id,
-                'beverages': beverage
+                'beverages': beverage,
+                'date': date_mock()
             }
             orders.append(new_order)
 
@@ -84,7 +91,8 @@ def create_repeted_clients_and_ingredients_order(create_ingredients, create_size
                 **third_most_repeated_client,
                 'ingredients': ingredients[0:5],
                 'size_id': size_id,
-                'beverages': beverage
+                'beverages': beverage,
+                'date': date_mock()
             }
             orders.append(new_order)
 
@@ -92,8 +100,9 @@ def create_repeted_clients_and_ingredients_order(create_ingredients, create_size
             **client_data_mock(),
             'ingredients': ingredients[0:5],
             'size_id': size_id,
-            'beverages': beverage
+            'beverages': beverage,
+            'date': date_mock()
         }
         orders.append(new_order)
 
-    return orders, most_repeated_client, most_repeated_ingredient, second_most_repeated_client, third_most_repeated_client
+    return orders, most_repeated_client, most_repeated_ingredient, second_most_repeated_client, third_most_repeated_client, month_with_more_revenue
