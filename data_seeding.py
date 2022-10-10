@@ -10,8 +10,8 @@ names = ["Jorge Salinas", "Carlos Martinez", "Pedro Perez", "Luis Rodriguez", "A
 
 addresses = ["Avenue "+str(i)+"th" for i in range(1,21)]
 
-beverages = [i for i in range(1,8)]
-ingredients = [i for i in range(1,8)]
+beverages = [i for i in range(1,10)]
+ingredients = [i for i in range(1,10)]
 
 order_url = "http://127.0.0.1:5000/order/"
 
@@ -36,15 +36,13 @@ for i in range(1,101):
     random_index = (random.randrange(1,20))
     data = {
             **client_info[random_index-1][random_index],
-            "ingredients":random.choices(ingredients, k=random.randrange(1,7)),
-            "size_id" : random.randrange(1,4),
-            "beverages": random.choices(beverages, k=random.randrange(1,6)),
-            # "date": "2015,6,5,8,10,10,10"
-            # #"date": datetime.utcnow().isoformat()
-            # #"date": datetime.today().isoformat()
+            'ingredients':random.choices(ingredients, k=random.randrange(1,7)),
+            'size_id' : random.randrange(1,4),
+            'beverages': random.choices(beverages, k=random.randrange(1,6)),
+            'date':  f'{random.randrange(1,12)}/{random.randrange(1,28)}/2022'
         }
-    create_order = requests.post(order_url, json = data)
-    #create_order = requests.post(order_url, json = data)
+    create_order = requests.post(order_url, json = json.dumps(data, default=str))
     print(create_order)
-    #json_response = json.loads(create_order)
+    json_response = json.loads(create_order.text)
+    print(json_response)
     

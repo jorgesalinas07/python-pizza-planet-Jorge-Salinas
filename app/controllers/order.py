@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -20,10 +21,15 @@ class OrderController(BaseController):
 
     @classmethod
     def create(cls, order: dict):
-        current_order = order.copy()
+        current_order = json.loads(order).copy()
         if not check_required_keys(cls.__required_info, current_order):
             return 'Invalid order payload', None
 
+        try:
+            current_order['date'] = datetime.strptime(current_order['date'], '%m/%d/%Y')
+        except KeyError:
+            pass
+        
         size_id = current_order.get('size_id')
         size = SizeManager.get_by_id(size_id)
 
@@ -32,18 +38,6 @@ class OrderController(BaseController):
 
         ingredient_ids = current_order.pop('ingredients', [])
         beverage_ids = current_order.pop('beverages', [])
-        # if type(current_order['date']) is str:
-        #     prueba = datetime(year= int(current_order['date'][:4]), month= int(current_order['date'][5]),
-        #     day= int(current_order['date'][7]), hour=int(current_order['date'][9]),
-        #     minute=int(current_order['date'][11:13]), second=int(current_order['date'][14:16]),
-        #     microsecond=int(current_order['date'][17:19]))
-        #     month= int(current_order['date'][5])
-        #     day= int(current_order['date'][7])
-        #     hour = int(current_order['date'][9])
-        #     minute = int(current_order['date'][11:13])
-        #     second = int(current_order['date'][14:16])
-        #     microsecod = int(current_order['date'][17:19])
-        #     current_order['date'] = prueba
         try:
             ingredients = IngredientManager.get_by_id_list(ingredient_ids)
             beverages = BeverageManager.get_by_id_list(beverage_ids)
