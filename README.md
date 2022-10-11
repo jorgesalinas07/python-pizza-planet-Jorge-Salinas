@@ -83,6 +83,13 @@ set FLASK_ENV=development
 python3 manage.py run
 ```
 
+## Running seed file
+- Please run the following command in the base path of the project to run the seed file
+```
+python data_seeding.py
+```
+
+
 ## Running the frontend
 
 - Clone git UI submodule
