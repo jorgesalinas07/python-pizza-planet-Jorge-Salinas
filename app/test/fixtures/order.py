@@ -58,9 +58,7 @@ def create_order(client, order, order_uri):
 @pytest.fixture
 def create_repeted_clients_and_ingredients_order(create_ingredients, create_size, 
      create_beverages, client_data):
-    most_repeated_client = client_data
-    second_most_repeated_client = client_data_mock()
-    third_most_repeated_client = client_data_mock()
+    top_3_clients = [client_data, client_data_mock(), client_data_mock()]
     month_with_more_revenue = date_mock()
     orders = []
     ingredients = [ingredient.get('_id') for ingredient in create_ingredients]
@@ -69,7 +67,7 @@ def create_repeted_clients_and_ingredients_order(create_ingredients, create_size
     size_id = create_size.json.get('_id')
     for i in range(0,6):
         new_order = {
-            **most_repeated_client,
+            **top_3_clients[0],
             'ingredients': [ingredients[0]],
             'size_id': size_id,
             'beverages': beverage,
@@ -78,7 +76,7 @@ def create_repeted_clients_and_ingredients_order(create_ingredients, create_size
         orders.append(new_order)
         if i % 2 == 0:
             new_order = {
-                **second_most_repeated_client,
+                **top_3_clients[1],
                 'ingredients': [ingredients[0]],
                 'size_id': size_id,
                 'beverages': beverage,
@@ -88,7 +86,7 @@ def create_repeted_clients_and_ingredients_order(create_ingredients, create_size
 
         if i == 4 or i==5:
             new_order = {
-                **third_most_repeated_client,
+                **top_3_clients[2],
                 'ingredients': ingredients[0:5],
                 'size_id': size_id,
                 'beverages': beverage,
@@ -105,4 +103,4 @@ def create_repeted_clients_and_ingredients_order(create_ingredients, create_size
         }
         orders.append(new_order)
 
-    return orders, most_repeated_client, most_repeated_ingredient, second_most_repeated_client, third_most_repeated_client, month_with_more_revenue
+    return orders, most_repeated_ingredient, month_with_more_revenue, top_3_clients
