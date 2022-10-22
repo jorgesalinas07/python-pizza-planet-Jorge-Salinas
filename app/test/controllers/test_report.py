@@ -6,8 +6,8 @@ from app.controllers.report import ReportController
 
 
 def test_get_all(app, create_repeted_clients_and_ingredients_order):
-    orders, most_repeated_ingredient_id, month_with_more_revenue, top_3_clients = create_repeted_clients_and_ingredients_order
-    month_with_more_revenue = datetime.strptime(month_with_more_revenue, '%m/%d/%Y')
+    orders, most_repeated_ingredient_id, date_with_more_revenue, top_3_clients = create_repeted_clients_and_ingredients_order
+    date_with_more_revenue = datetime.strptime(date_with_more_revenue, '%m/%d/%Y')
     created_order_result = []
     for order in orders:
         created_order, error = OrderController.create(order)
@@ -19,5 +19,5 @@ def test_get_all(app, create_repeted_clients_and_ingredients_order):
     pytest.assume(report_from_db['client_data']['clients'][0]['client_name'] == top_3_clients[0]["client_name"])
     pytest.assume(report_from_db['client_data']['clients'][1]['client_name'] == top_3_clients[1]["client_name"])
     pytest.assume(report_from_db['client_data']['clients'][2]['client_name'] == top_3_clients[2]["client_name"])
-    pytest.assume(report_from_db['month_with_more_revenue'] == month_with_more_revenue.month)
+    pytest.assume(report_from_db['month_with_more_revenue'] == date_with_more_revenue.month)
     

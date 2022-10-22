@@ -4,6 +4,7 @@ from datetime import datetime
 from ..utils.functions import (shuffle_list, get_random_sequence,
                                get_random_string)
 
+
 def date_mock() -> str:
     return f'{random.randrange(1,12)}/{random.randrange(1,28)}/2022'
 
@@ -40,6 +41,41 @@ def order(client_data, create_ingredients, create_size, create_beverages) -> dic
     }
 
 
+def order_with_created_ingredient_and_beverage(client_data: dict, ingredients: list, size_id: int, 
+                                                beverages: list, date: str) -> dict:
+    return {
+        **client_data,
+        'ingredients': ingredients,
+        'size_id': size_id,
+        'beverages': beverages,
+        'date': date
+    }
+
+
+def orders_with_repeted_clients_and_ingredient(top_3_clients, ingredients, size_id, beverage, month_with_more_revenue):
+    orders = []
+    for i in range(0, 6):
+        new_order = order_with_created_ingredient_and_beverage(
+            top_3_clients[0], [ingredients[0]], size_id, beverage, month_with_more_revenue)
+        orders.append(new_order)
+
+        if i % 2 == 0:
+            new_order = order_with_created_ingredient_and_beverage(
+                top_3_clients[1], [ingredients[0]], size_id, beverage, date_mock())
+            orders.append(new_order)
+
+        if i == 4 or i == 5:
+            new_order = order_with_created_ingredient_and_beverage(
+                top_3_clients[2], ingredients[0:5], size_id, beverage, date_mock())
+            orders.append(new_order)
+
+        new_order = order_with_created_ingredient_and_beverage(
+            client_data_mock(), ingredients[0:5], size_id, beverage, date_mock())
+        orders.append(new_order)
+
+    return orders
+
+
 @pytest.fixture
 def create_orders(create_order) -> list:
     orders = []
@@ -56,51 +92,15 @@ def create_order(client, order, order_uri):
 
 
 @pytest.fixture
-def create_repeted_clients_and_ingredients_order(create_ingredients, create_size, 
-     create_beverages, client_data):
+def create_repeted_clients_and_ingredients_order(create_ingredients, create_size,
+                                                 create_beverages, client_data):
     top_3_clients = [client_data, client_data_mock(), client_data_mock()]
     month_with_more_revenue = date_mock()
-    orders = []
     ingredients = [ingredient.get('_id') for ingredient in create_ingredients]
     beverage = [beverage.get('_id') for beverage in create_beverages]
     most_repeated_ingredient = ingredients[0]
     size_id = create_size.json.get('_id')
-    for i in range(0,6):
-        new_order = {
-            **top_3_clients[0],
-            'ingredients': [ingredients[0]],
-            'size_id': size_id,
-            'beverages': beverage,
-            'date': month_with_more_revenue
-        }
-        orders.append(new_order)
-        if i % 2 == 0:
-            new_order = {
-                **top_3_clients[1],
-                'ingredients': [ingredients[0]],
-                'size_id': size_id,
-                'beverages': beverage,
-                'date': date_mock()
-            }
-            orders.append(new_order)
-
-        if i == 4 or i==5:
-            new_order = {
-                **top_3_clients[2],
-                'ingredients': ingredients[0:5],
-                'size_id': size_id,
-                'beverages': beverage,
-                'date': date_mock()
-            }
-            orders.append(new_order)
-
-        new_order = {
-            **client_data_mock(),
-            'ingredients': ingredients[0:5],
-            'size_id': size_id,
-            'beverages': beverage,
-            'date': date_mock()
-        }
-        orders.append(new_order)
+    orders = orders_with_repeted_clients_and_ingredient(
+        top_3_clients, ingredients, size_id, beverage, month_with_more_revenue)
 
     return orders, most_repeated_ingredient, month_with_more_revenue, top_3_clients
