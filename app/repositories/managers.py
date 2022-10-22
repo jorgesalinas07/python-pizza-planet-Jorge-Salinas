@@ -1,3 +1,4 @@
+import json
 from typing import Any, List, Optional, Sequence
 from itertools import zip_longest
 from sqlalchemy.sql import text, column
@@ -5,7 +6,7 @@ from sqlalchemy.sql import text, column
 from .models import Beverage, Ingredient, Order, OrderDetail, Size, db
 from .serializers import (BeverageSerializer, IngredientSerializer, OrderSerializer,
                           SizeSerializer, ma)
-
+from collections import Counter
 
 class BaseManager:
     model: Optional[db.Model] = None
@@ -99,3 +100,70 @@ class BeverageManager(BaseManager):
     def get_by_id_list(cls, ids: Sequence):
         return cls.session.query(cls.model).filter(cls.model._id.in_(set(ids))).all() or []
         
+class ReportManager:
+    order_model = Order
+    ingredient_model = Ingredient
+    order_detail_model = OrderDetail
+
+    @classmethod
+    def get_report(cls):
+        response = {
+            'ingredient':cls.get_most_requested_ingredient(),
+            'client_data':cls.get_best_3_clients(),
+            'month_with_more_revenue': cls.get_month_with_more_revenue()
+        }
+        return response
+    
+    @classmethod
+    def get_most_requested_ingredient(cls):
+        ingredient_details = cls.order_detail_model.query.all()
+        ingredients = [ingredient_detail.ingredient_id
+        for ingredient_detail in ingredient_details if ingredient_detail.ingredient_id != None]
+
+        count=Counter(ingredients)
+        max_quantity, max_ingredient_id = 0,0
+        for id, quantity in count.items():
+            if quantity>max_quantity:
+                max_quantity = quantity
+                max_ingredient_id = id
+        max_ingredient = cls.ingredient_model.query.get(max_ingredient_id)
+        return {
+                'id': max_ingredient._id,
+                'name': max_ingredient.name,
+                'times': max_quantity,
+            }
+    
+    @classmethod
+    def get_best_3_clients(cls):
+        client_details = cls.order_model.query.all()
+        clients_dni, data = [],[]
+        client_id_info = {}
+        for client_detail in client_details:
+            clients_dni.append(client_detail.client_dni)
+            client_id_info[client_detail.client_dni] = client_detail._id
+        count=Counter(clients_dni)
+        
+        top_clients = sorted(
+        dict(count).items(), key=lambda x: x[1], reverse=True)
+        for client in top_clients:
+            if len(data) == 3:
+                break
+            data.append(cls.order_model.query.get(client_id_info[client[0]]))
+        response = {
+            'clients':[
+                {
+                    "client_name":user.client_name,
+                    "client_dni": user.client_dni,
+                    "client_phone": user.client_phone
+                } for user in data]
+            }
+        return response 
+
+    @classmethod
+    def get_month_with_more_revenue(cls):
+        order_dates = [order.date for order in cls.order_model.query.all()]
+        count = Counter(order_dates)
+        top_months = sorted(
+        dict(count).items(), key=lambda x: x[1], reverse=True)
+        return top_months[0][0].month
+
