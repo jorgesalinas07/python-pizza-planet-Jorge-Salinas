@@ -52,15 +52,13 @@ _For windows users:_
 - Install all necessary dependencies:
 
 ```bash
-pip3 install -r requirements.txt
+make install
 ```
 
 - Start the database (Only needed for the first run):
 
 ```bash
-python3 manage.py db init
-python3 manage.py db migrate
-python3 manage.py db upgrade
+make start_database
 ```
 
 - If you want to use the hot reload feature set FLASK_ENV before running the project:
@@ -80,13 +78,13 @@ set FLASK_ENV=development
 - Run the project with:
 
 ```bash
-python3 manage.py run
+make run_project
 ```
 
 ## Running seed file
 - Please run the following command in the base path of the project to run the seed file
 ```
-python data_seeding.py
+make seed
 ```
 
 
@@ -117,5 +115,5 @@ ext install ritwickdey.LiveServer
 - Run the test command
 
 ```bash
-python3 manage.py test
+make test
 ```
